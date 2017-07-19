@@ -29,7 +29,7 @@ vectarrow(p_Ankle,p_Heel);
 title('Optimum Posture to Reduce Joint Torque')
 xlabel('x Position')
 ylabel('y Position')
-%hold on %Uncomment to view every iteration graphed on same plot
+hold on %Uncomment to view every iteration graphed on same plot
 view(0,90)%To project the the vector onto xy plane
 end
 

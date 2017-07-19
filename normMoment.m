@@ -19,8 +19,8 @@ function [ Norm_Curr ] = normMoment( x0 )
         p_Heel = [-0.085,-0.085,0];
 
         %Applied Load
-        Mass_Person = 80;
-        Load_Mag = 25;
+        Mass_Person = 90*9.8;
+        Load_Mag = 135*9.8;
 
         %Angle Inputs in Degrees
         Ankle_Ai = 123;
@@ -36,6 +36,7 @@ function [ Norm_Curr ] = normMoment( x0 )
         ri_Knee = [(-1*Femur*cosd(Beta)),(Femur*sind(Beta)),0]+ri_Hip
         ri_Ankle = [(Tibia*cosd(Ankle_Ai)),(Tibia*sind(Ankle_Ai)),0] + ri_Knee
         F = [0,-Load_Mag,0];
+        F_COM=[0,-((Mass_Person*0.634)),0];
 
         Initial_Posture = [ri_Hip;ri_Knee;ri_Ankle];
 
@@ -60,10 +61,19 @@ function [ Norm_Curr ] = normMoment( x0 )
         p_Load = r_Hip + p_Hip;
         Centroid_P = Centroid(r_Hip, r_Knee, r_Ankle, Spine, Femur, Tibia);
 
-    %     Calculation Moments
-        M_Hip = CrossProduct(r_Hip,F);
-        M_Knee = CrossProduct(r_Knee,F);
-        M_Ankle = CrossProduct(r_Ankle,F);
+        %
+        rC_Hip = p_Hip - Centroid_P;
+        rC_Knee = p_Knee - Centroid_P; 
+        rC_Ankle = [0,0,0] - Centroid_P;
+        
+        %Calculation of Moments
+        M_Hip = CrossProduct(r_Hip,F) + CrossProduct(rC_Hip,F_COM);
+        M_Knee = CrossProduct(r_Knee,F)+ CrossProduct(rC_Knee,F_COM);
+        M_Ankle = CrossProduct(r_Ankle,F)+CrossProduct(rC_Ankle,F_COM);
+%     %     Calculation Moments
+%         M_Hip = CrossProduct(r_Hip,F);
+%         M_Knee = CrossProduct(r_Knee,F);
+%         M_Ankle = CrossProduct(r_Ankle,F);
 
         F_Reaction=[0,(Load_Mag+Mass_Person),0];
         rC_Load = p_Load - Centroid_P;
@@ -77,9 +87,9 @@ function [ Norm_Curr ] = normMoment( x0 )
         if(M_Load-M_Reaction_Toe > 0 || M_Load-M_Reaction_Heel >0)
             Iter2 = Iter2+1;
             plot(Centroid_P(1),Centroid_P(2),'*')
-            hold on
-            DrawPosture([r_Hip;r_Knee;r_Ankle])
-            drawnow
+%             hold on
+%             DrawPosture([r_Hip;r_Knee;r_Ankle])
+%             drawnow
         end
 
         Curr_Moment = [M_Hip,M_Knee,M_Ankle];
